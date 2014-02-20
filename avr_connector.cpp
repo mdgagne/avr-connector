@@ -13,6 +13,11 @@
 #include <string>
 #include "avr_connector.h"
 
+
+namespace
+{
+
+}
 namespace pimash
 {
 // ************************************************************
@@ -39,9 +44,29 @@ avr_connector::avr_connector (char* uart)
 
 // ************************************************************
 // FIXME
-float avr_connector::get_temp_sp (void)
-    {
-    return (150.0);
-    }
+pit_byte_t avr_connector::read_byte (void) {return 0;}
+
+// ************************************************************
+// FIXME
+
+// ************************************************************
+// FIXME
+pit_word_t avr_connector::read_word (void) {return 0;}
+
+// ************************************************************
+// FIXME
+pit_dword_t avr_connector::read_dword (void) {return 0;}
+
+// ************************************************************
+// FIXME
+pit_float_t avr_connector::read_float (void) {return 0;}
+
+// ************************************************************
+// FIXME
+int avr_connector::uart_send (unsigned char* buff, int size) {return 0;}
+
+// ************************************************************
+// FIXME
+int avr_connector::uart_recv (unsigned char* buff, int size) {return 0;}
 }; // pimash
 

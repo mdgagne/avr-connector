@@ -5,7 +5,9 @@
  ************************************************************
  */
 #ifndef __LIB_PIMASH__
-#define __LIB_PIMASH_
+#define __LIB_PIMASH__
+#include <vector>
+#include "../avr-shared/pi_protocol.h"
 
 namespace pimash
 {
@@ -18,10 +20,18 @@ class avr_connector
         avr_connector (char* uart);
 
         // TODO: Define read/write operations
-        float get_temp_sp (void);
-        
+        pit_byte_t read_byte (void);
+        pit_word_t read_word (void);
+        pit_dword_t read_dword (void);
+        pit_float_t read_float (void);
+
+    private:
+        int uart_send (unsigned char* buff, int size);
+        int uart_recv (unsigned char* buff, int size);
+
     private:    
         int uart_stream;
+        std::vector<unsigned char> vecBuffer;
     };
 
 }; // pimash
