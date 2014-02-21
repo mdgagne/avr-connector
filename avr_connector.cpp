@@ -12,12 +12,8 @@
 #include <iostream>
 #include <string>
 #include "avr_connector.h"
+#include "../avr-shared/pi_protocol.h"
 
-
-namespace
-{
-
-}
 namespace pimash
 {
 // ************************************************************
@@ -43,30 +39,90 @@ avr_connector::avr_connector (char* uart)
     }
 
 // ************************************************************
-// FIXME
-pit_byte_t avr_connector::read_byte (void) {return 0;}
+avr_connector::~avr_connector ()
+    {
+    close (uart_stream);
+    }
+
+// ************************************************************
+pit_byte_t avr_connector::read_byte (byte_address_t addr)
+    {
+    // Send the request
+    const pi_request_t request =  
+        {
+        start_request, 
+        (pif_read << 4) | (pit_byte),
+        addr
+        };
+
+    int count = uart_send (request);
+
+    // Check for successful send and read the response
+    pi_response_t response = {0};    
+    if (sizeof (request) == count)
+        {
+        // receieve the data (blocking)
+        count = uart_recv (response);
+        }
+
+    // Expecting to receive a full response
+    if (count != sizeof (response))
+        {
+        throw std::length_error ("Wrong number of bytes"); 
+        }          
+
+    // Return the pit_byte_t data
+    return pit_byte_t (response.data[0]);
+    }
 
 // ************************************************************
 // FIXME
+pit_word_t avr_connector::read_word (word_address_t addr) {return 0;}
 
 // ************************************************************
 // FIXME
-pit_word_t avr_connector::read_word (void) {return 0;}
+pit_dword_t avr_connector::read_dword (dword_address_t addr) {return 0;}
 
 // ************************************************************
 // FIXME
-pit_dword_t avr_connector::read_dword (void) {return 0;}
+pit_float_t avr_connector::read_float (float_address_t addr) {return 0;}
 
 // ************************************************************
-// FIXME
-pit_float_t avr_connector::read_float (void) {return 0;}
+int avr_connector::uart_send (const pi_request_t& request) 
+    {
+    int count = 0;
+    if (-1 != uart_stream)
+        {
+        count = write (
+            uart_stream, 
+            reinterpret_cast<const char*> (&request), 
+            sizeof (request));
+        }
+
+    return count;
+    }
 
 // ************************************************************
-// FIXME
-int avr_connector::uart_send (unsigned char* buff, int size) {return 0;}
+int avr_connector::uart_recv (pi_response_t& response) 
+    {
+    int count = 0;
+    while (count < sizeof (response))
+        {
+        const int recv = read (
+            uart_stream, 
+            reinterpret_cast<char*> (&response), 
+            sizeof (response));
 
-// ************************************************************
-// FIXME
-int avr_connector::uart_recv (unsigned char* buff, int size) {return 0;}
+        // Check for err
+        if (-1 == recv)
+            {
+            break;
+            }
+
+        count += recv;
+        }
+
+    return count;
+    }
 }; // pimash
 

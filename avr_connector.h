@@ -18,20 +18,21 @@ class avr_connector
     public:
         // Opens ttyAMA0, configures port for 115200/8/N/1
         avr_connector (char* uart);
+        ~avr_connector ();
 
-        // TODO: Define read/write operations
-        pit_byte_t read_byte (void);
-        pit_word_t read_word (void);
-        pit_dword_t read_dword (void);
-        pit_float_t read_float (void);
+        // Read/Write operations
+        pit_byte_t read_byte (byte_address_t addr);
+        pit_word_t read_word (word_address_t addr);
+        pit_dword_t read_dword (dword_address_t addr);
+        pit_float_t read_float (float_address_t addr);
 
     private:
-        int uart_send (unsigned char* buff, int size);
-        int uart_recv (unsigned char* buff, int size);
+        // Send/Recv helpers
+        int uart_send (const pi_request_t& request);
+        int uart_recv (pi_response_t& response);
 
     private:    
         int uart_stream;
-        std::vector<unsigned char> vecBuffer;
     };
 
 }; // pimash
